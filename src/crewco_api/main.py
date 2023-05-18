@@ -1,4 +1,4 @@
-from api.crewco_api.api import API
+from src.crewco_api.api import API
 
 def api():
     api = API()

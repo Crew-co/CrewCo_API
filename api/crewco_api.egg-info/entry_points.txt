@@ -1,2 +1,0 @@
-[console_scripts]
-myapi = crewco_api.main:main

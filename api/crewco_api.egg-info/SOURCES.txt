@@ -1,9 +1,0 @@
-setup.py
-crewco_api/__init__.py
-crewco_api/api.py
-crewco_api/main.py
-crewco_api.egg-info/PKG-INFO
-crewco_api.egg-info/SOURCES.txt
-crewco_api.egg-info/dependency_links.txt
-crewco_api.egg-info/entry_points.txt
-crewco_api.egg-info/top_level.txt

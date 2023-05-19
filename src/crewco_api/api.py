@@ -2,6 +2,8 @@ import base64
 from base64 import b64encode
 from Crypto.Cipher import AES
 import json
+from pathlib import Path
+import requests as rq
 
 
 def to_b64_padded(plaintext, block_size):
@@ -24,6 +26,7 @@ class API:
         self.data = {}
         self.load()
         self.key = key = "867e685b3ffd0b70".encode('utf-8')
+        self.path = Path(self.filename)
         if len(self.key) != 16:
             print("Key must be 16 charters long")
             exit()
@@ -31,6 +34,13 @@ class API:
             self.key = key
             self.iv = key
 
+        # if(self.path.exists()):
+        #    pass
+
+    # else:
+    #    print(f"NodeList.json was not found")
+    #    print(os.getcwd()+f"\{self.path}")
+    #    exit()
     def encrypt(self, message):
         plaintext = message
         padded_plaintext = to_b64_padded(plaintext, AES.block_size)
@@ -62,3 +72,30 @@ class API:
 
     def lookup(self, name):
         return self.data.get(name)
+
+    def add(self, name, srv):
+        self.data[name] = srv
+        self.save()
+
+    def get_location(self, location):
+        url = "http://maps.googleapis.com/maps/api/geocode/json"
+        params = {'address': location}
+        r = rq.get(url=url, params=params)
+        data = r.json()
+        latitude = data['results'][0]['geometry']['location']['lat']
+        longitude = data['results'][0]['geometry']['location']['lng']
+        formatted_address = data['results'][0]['formatted_address']
+        final = f"Latitude:{latitude},Longitude:{longitude}, Formatted-Address:{formatted_address}"
+        return final
+
+    def override(self, name, key):
+        endpoint = "api.aris-net.com:6669/api/override"
+        data = {
+            'name': self.encrypt(name).decode('utf-8'),
+            'key': self.encrypt(key).decode('utf-8')
+        }
+        res = rq.post(url=endpoint, json=data)
+        if(res.status_code != 500):
+            return res.json()["status"]
+        else:
+            print(res.status_code)
